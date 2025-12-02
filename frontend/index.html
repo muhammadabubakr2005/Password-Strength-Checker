@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Password Strength Checker</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+    }
+
+    .container {
+        width: 450px;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 35px;
+        border-radius: 22px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(12px);
+        text-align: center;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        font-weight: 600;
+        font-size: 28px;
+        letter-spacing: 1px;
+    }
+
+    input {
+        width: 90%;
+        padding: 14px;
+        margin: 15px 0;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+        font-size: 18px;
+        text-align: center;
+    }
+
+    button {
+        width: 95%;
+        padding: 14px;
+        background: #00eaff;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-weight: 600;
+    }
+
+    button:hover {
+        background: #00bcd4;
+    }
+
+    .strength-bar {
+        width: 100%;
+        height: 12px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        width: 0%;
+        background: #ff4b5c;
+        transition: 0.5s ease;
+        border-radius: 10px;
+    }
+
+    .response-box {
+        margin-top: 20px;
+        text-align: left;
+        padding: 15px;
+        background: rgba(255,255,255,0.18);
+        border-radius: 12px;
+        max-height: 220px;
+        overflow-y: auto;
+        font-size: 15px;
+        line-height: 1.4;
+        white-space: pre-line;
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Password Strength Checker</h2>
+
+    <input type="text" id="password" placeholder="Type your password here..." autofocus />
+
+    <button onclick="checkPassword()">Check Strength</button>
+
+    <div class="strength-bar">
+        <div class="bar-fill" id="bar"></div>
+    </div>
+
+    <div class="response-box" id="output">
+        Type a password and press Enter or click "Check Strength".
+    </div>
+</div>
+
+<script>
+document.getElementById("password").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        checkPassword();
+    }
+});
+
+function checkPassword() {
+    const password = document.getElementById("password").value;
+    const output = document.getElementById("output");
+
+    if (!password.trim()) {
+        output.innerText = "⚠️ Please type a password.";
+        return;
+    }
+
+    output.innerText = "Checking strength... 🔍";
+
+    fetch("http://127.0.0.1:8000/check", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const bar = document.getElementById("bar");
+        bar.style.width = data.score + "%";
+
+        if (data.score < 25) bar.style.background = "#ff4b5c";
+        else if (data.score < 50) bar.style.background = "#ff884b";
+        else if (data.score < 70) bar.style.background = "#ffd739";
+        else if (data.score < 85) bar.style.background = "#4caf50";
+        else bar.style.background = "#00e676";
+
+        let details = data.details.join("\n• ");
+
+        output.innerText =
+            `Password: ${data.password}\n` +
+            `Score: ${data.score}\n` +
+            `Strength: ${data.category}\n\n` +
+            `Details:\n• ${details}`;
+    })
+    .catch(err => {
+        output.innerText =
+            "❌ Error: Unable to reach the API.\n" +
+            "Make sure FastAPI server is running.\n\n" +
+            err;
+    });
+}
+</script>
+
+</body>
+</html>
