@@ -1,3 +1,4 @@
+from password_checker.breach_api import check_breach
 from .entropy import calculate_entropy
 from .dictionary_check import is_common_password
 from .patterns import detect_patterns
@@ -10,7 +11,8 @@ def evaluate_password(password: str, dictionary: set):
     entropy = calculate_entropy(password)
     patterns = detect_patterns(password)
     dictionary_hit = is_common_password(password, dictionary)
-
+    breach_count = check_breach(password)
+    
     # -----------------------------------------------------------
     # 1) Entropy Scoring (40 points)
     # -----------------------------------------------------------
@@ -77,6 +79,12 @@ def evaluate_password(password: str, dictionary: set):
         for p in patterns[:3]:
             report.append("⚠️ " + p)
             score -= 10
+            
+    # -----------------------------------------------------------
+    # 6) Breach penalties (−30 if found)
+    if breach_count > 0:
+        report.append(f"❌ Found in {breach_count} data breaches")
+        score -= 30
 
     # -----------------------------------------------------------
     # Final Score Normalization (0–100)
