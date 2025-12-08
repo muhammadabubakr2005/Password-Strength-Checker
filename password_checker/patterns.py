@@ -10,7 +10,7 @@ COMMON_PATTERNS = [
 
     # Common weak words
     r"password", r"admin", r"letmein", r"welcome", r"iloveyou",
-    r"pakistan", r"pak123", r"pass123", r"usman", r"love", r"hello",
+    r"pakistan", r"pak123", r"pass123", r"usman", r"love", r"hello", r"user"
 
     # Variants and leetspeak
     r"p@ss", r"p@ssw0rd", r"p4ss", r"p455", r"l0ve", r"l0ver",
@@ -34,7 +34,7 @@ COMMON_PATTERNS = [
     r"(.)\1{2,}",  # aaa, 111, !!!, etc.
 
     # Common name patterns (can expand)
-    r"usman", r"ali", r"ahmed", r"ahmad", r"hassan", r"hussain",
+    r"usman", r"ali", r"ahmed", r"umer", r"hassan", r"hussain",
 ]
 
 
